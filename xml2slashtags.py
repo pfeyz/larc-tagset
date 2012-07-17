@@ -55,9 +55,6 @@ def tagequiv_from_csv(filename):
             for part in parts[1:]:
                 if part[0] == "|":
                     patternDict['stem'] = part[1:]
-                elif part[0] == ";":
-                    patternDict[''] = part[1:]
-                    patternDict['wordform'] = part[1:]
                 else:
                     for symbol, key in [("&","sxfx"), ("-", "sfx"),
                                         (":", "subPos")]:
