@@ -1,3 +1,13 @@
+#!/usr/bin/env python2
+
+""" Converts a CHILDES XML file to a plain-text slash/tag format. Outputs to
+standard out.
+
+usage:
+  python xml2slashtags.py adam01.xml adam02.xml > adam-1-2-slashtags.txt
+
+"""
+
 import csv
 import re
 import sys
@@ -5,29 +15,31 @@ import sys
 from talkbank_parser.talkbank_parser import MorParser
 
 def tagequiv_from_csv(filename):
-    """ Creates a tagset equivalency list from a csv file
+    """ Creates a list of mortag-to-larctag mappings.
 
     args:
-      `filename`: the name of the csv file to read.
+      `filename: the name of the csv file to read.
+                 the entries in filename must match the following regular
+                 expression:
 
-    returns: a list of lists. each nested list contains a 'sparse
-      mor_token' as its first element, and a pos tag as its second.
-      a sparse mor token is a mor token with no required fields. a
-      blank dict would count as a valid sparse token.
+                 \w*?(:\w+?)*(&\w+?)*(-\w+?)(\|\w+)?,\w+?
+       aka
+                 pos:feature&fusion-suffix|wordform, newtag
+
+       where all parts besides pos and |wordform can occur more than once, and
+       newtag is arbitrary.
+
+    returns: a list of lists. each nested list contains a 'sparse mor tag' as
+      its first element, and a string pos tag as its second.  a 'sparse mor tag'
+      is a dict of key:value pairs for each part of a composite mor tag. a blank
+      dict would count as a valid sparse mor tag, and would match anything not
+      otherwise matched.
 
         [
           [{sparse-mor-token-dict}: 'rewrite-tag'],
           [{}, ''],
           ...
         ]
-
-     the entries in filename must match the following regular
-     expression: \w*?(:\w+?)*(&\w+?)*(-\w+?)(\|\w+)?,\w+?
-       aka
-                 pos:feature&fusion-suffix|wordform, newtag
-       where all parts besides pos and |wordform can occur more than
-       once, and newtag is arbitrary.
-
     """
 
 
@@ -59,7 +71,7 @@ def tagequiv_from_csv(filename):
             sorted(translation, key=lambda x: x[0], reverse=True)]
 
 def translator(mapping):
-    """ Accepts a list of tuples specifying mappings, returns a function that
+    """ Accepts a list of mortag-to-larctag mappings, returns a function that
     accepts a MorWord and returns a slash/tag version of it"""
 
     def translate(mor_word):
