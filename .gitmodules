@@ -1,0 +1,3 @@
+[submodule "talkbank_parser"]
+	path = talkbank_parser
+	url = git://github.com/pfeyz/talkbank-parser.git
