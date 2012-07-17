@@ -15,6 +15,30 @@ import sys
 
 from talkbank_parser.talkbank_parser import MorParser
 
+def split_mor_pattern(pattern):
+    """ Accepts a string describing a mor tag, breaks up its parts and returns
+    it as a dictionary.
+
+    the pattern format is
+
+      pos:feature&fusion-suffix|wordform
+
+    """
+    match_components = {}
+    parts = re.findall("(?:^|[:&-]|\|)\w+", pattern)
+    match_components['pos'] = parts[0]
+    for part in parts[1:]:
+        if part.startswith("|"):
+            match_components['stem'] = part[1:]
+            continue
+        for symbol, key in [("&","sxfx"), ("-", "sfx"),
+                            (":", "subPos")]:
+            if part[0] == symbol:
+                if key not in match_components:
+                    match_components[key] = []
+                match_components[key].append(part[1:])
+    return match_components
+
 def tagequiv_from_csv(filename):
     """ Creates a list of mortag-to-larctag mappings.
 
@@ -43,30 +67,11 @@ def tagequiv_from_csv(filename):
         ]
     """
 
-
-    translation = []
-
     with open(filename) as cvsfile:
         lines = csv.reader(cvsfile)
-        for pattern, newtag in lines:
-            match_components = {}
-            parts = re.findall("(?:^|[:&-]|\|)\w+", pattern)
-            priority = len(parts)
-            match_components['pos'] = parts[0]
-            for part in parts[1:]:
-                if part.startswith("|"):
-                    match_components['stem'] = part[1:]
-                    continue
-                for symbol, key in [("&","sxfx"), ("-", "sfx"),
-                                    (":", "subPos")]:
-                    if part[0] == symbol:
-                        if key not in match_components:
-                            match_components[key] = []
-                        match_components[key].append(part[1:])
-            translation.append((priority, match_components, newtag))
 
-    return [i[1:3] for i in
-            sorted(translation, key=lambda x: x[0], reverse=True)]
+    return [(split_mor_pattern(pattern), newtag) for (pattern, newtag) in lines]
+
 
 def translator(mapping):
     """ Accepts a list of mortag-to-larctag mappings, returns a function that
