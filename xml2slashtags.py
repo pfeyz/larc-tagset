@@ -63,12 +63,11 @@ def translator(mapping):
     accepts a MorWord and returns a slash/tag version of it"""
 
     def translate(mor_word):
-        for rules, replacement in mapping:
-            for key, val in rules.iteritems():
-                match = True
-                if mor_word.__getattribute__(key) != val:
-                    match = False
-            if match:
+        for ruledict, replacement in mapping:
+            for attr, expected in ruledict.iteritems():
+                if mor_word.__getattribute__(attr) != expected:
+                    break
+            else:
                 return (mor_word.word, replacement)
         return (mor_word.word, mor_word.pos)
     return translate
