@@ -1,9 +1,10 @@
 #!/usr/bin/env python2
 
-""" Converts a CHILDES XML file to a plain-text slash/tag format. Outputs to
-standard out.
+""" Converts a CHILDES XML file to a plain-text larc-tagged slash/tag
+format. Writes to standard out.
 
 usage:
+
   python xml2slashtags.py adam01.xml adam02.xml > adam-1-2-slashtags.txt
 
 """
@@ -48,21 +49,21 @@ def tagequiv_from_csv(filename):
     with open(filename) as cvsfile:
         lines = csv.reader(cvsfile)
         for pattern, newtag in lines:
-            patternDict = {}
+            match_components = {}
             parts = re.findall("(?:^|[:&-]|\|)\w+", pattern)
             priority = len(parts)
-            patternDict['pos'] = parts[0]
+            match_components['pos'] = parts[0]
             for part in parts[1:]:
-                if part[0] == "|":
-                    patternDict['stem'] = part[1:]
-                else:
-                    for symbol, key in [("&","sxfx"), ("-", "sfx"),
-                                        (":", "subPos")]:
-                        if part[0] == symbol:
-                            if key not in patternDict:
-                                patternDict[key] = []
-                            patternDict[key].append(part[1:])
-            translation.append((priority, patternDict, newtag))
+                if part.startswith("|"):
+                    match_components['stem'] = part[1:]
+                    continue
+                for symbol, key in [("&","sxfx"), ("-", "sfx"),
+                                    (":", "subPos")]:
+                    if part[0] == symbol:
+                        if key not in match_components:
+                            match_components[key] = []
+                        match_components[key].append(part[1:])
+            translation.append((priority, match_components, newtag))
 
     return [i[1:3] for i in
             sorted(translation, key=lambda x: x[0], reverse=True)]
