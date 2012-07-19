@@ -67,8 +67,8 @@ def tagequiv_from_csv(filename):
 
     with open(filename) as cvsfile:
         lines = csv.reader(cvsfile)
-
-    return [(split_mor_pattern(pattern), newtag) for (pattern, newtag) in lines]
+        return [(split_mor_pattern(pattern), newtag)
+                for (pattern, newtag) in lines]
 
 
 def translator(mapping):
