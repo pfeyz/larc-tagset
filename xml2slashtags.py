@@ -1,10 +1,13 @@
 #!/usr/bin/env python2
 
+import argparse
 import csv
 import re
-import sys
+from os import path
 
 from talkbank_parser.talkbank_parser import MorParser
+
+here = path.dirname(path.abspath(__file__))
 
 def split_mor_pattern(pattern):
     """ Accepts a string describing a mor tag, breaks up its parts and returns
@@ -101,7 +104,9 @@ def main(mappingfn, corpora):
             print e
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print "Script requires at least one xml corpus file as an argument"
-    else:
-        main("larc-tags.csv", sys.argv[1:])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filenames", nargs="+")
+    parser.add_argument("-m", "--mapping-file", required=False,
+                        default=path.join(here, "mor-to-larc-mapping.csv"))
+    args = parser.parse_args()
+    main(args.mapping_file, args.filenames)
