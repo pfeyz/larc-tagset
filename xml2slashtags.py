@@ -108,7 +108,9 @@ def translate_document(corpora, mappingfn, target_speaker=None,
             print e
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=("Convert an XML Talkbank file to slash/tag "
+                     "format in an alternate tagset"))
     parser.add_argument("filenames", nargs="+", help="Talbank XML files.")
     parser.add_argument("-s", "--speaker", metavar="SPEAKER",
                         help="Filter output to utterances by %(metavar)s")
