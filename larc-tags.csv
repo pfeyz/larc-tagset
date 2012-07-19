@@ -27,8 +27,8 @@ det:wh,det
 pro:poss:det,det
 det:num-PL,det-pl
 pro:exist,ext
-n:gerundGERUND,ger
-n:gerundGERUND-PL,ger-pl
+n:gerund-GERUND,ger
+n:gerund-GERUND-PL,ger-pl
 pro:indef,idf
 pro:indef-PL,idf
 co,int
@@ -40,13 +40,13 @@ aux,mod
 n:adj,n
 n:adj-DIM,n
 n:adj-NESS,n
-n:vAGT,n
+n:v-AGT,n
 n-DIM,n
 n-FULL,n
 n&PL,n-pl
 n:pt,n-pl
-n:vAGT-PL,n-pl
-nDIM-PL,n-pl
+n:v-AGT-PL,n-pl
+n-DIM-PL,n-pl
 n-PL,n-pl
 n-PL,n-pl
 n:prop,n-pr
