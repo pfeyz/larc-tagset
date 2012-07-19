@@ -14,6 +14,13 @@ def split_mor_pattern(pattern):
 
       pos:feature&fusion-suffix|wordform
 
+    >>> split_mor_pattern("pro")
+    {'pos': 'pro'}
+    >>> split_mor_pattern("neo|weekaweela")
+    {'pos': 'neo', 'stem': 'weekaweela'}
+    >>> split_mor_pattern("pro:indef-PL")
+    {'sfx': ['PL'], 'pos': 'pro', 'subPos': ['indef']}
+
     """
     match_components = {}
     parts = re.findall("(?:^|[:&-]|\|)\w+", pattern)
