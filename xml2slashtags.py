@@ -88,25 +88,41 @@ def translator(mapping):
         return (mor_word.word, mor_word.pos)
     return translate
 
-def main(mappingfn, corpora):
+def translate_document(corpora, mappingfn, target_speaker=None,
+                       label_speakers=True):
     mapping = tagequiv_from_csv(mappingfn)
     slash_tagger = translator(mapping)
     parser = MorParser("{http://www.talkbank.org/ns/talkbank}")
     for fn in corpora:
         try:
             for speaker, utterance in parser.parse(fn):
-                print "{0}:".format(speaker),
-                for morWord in utterance:
-                    word, tag = slash_tagger(morWord)
-                    print "{0}/{1}".format(word, tag),
-                print
+                if target_speaker is not None and speaker != target_speaker:
+                    continue
+                words = [slash_tagger(morWord) for morWord in utterance]
+                sent = " ".join(["{0}/{1}".format(*mw) for mw in words])
+                if label_speakers:
+                    yield "{0}: {1}".format(speaker, sent)
+                else:
+                    yield sent
         except IOError, e:
             print e
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("filenames", nargs="+")
+    parser.add_argument("filenames", nargs="+", help="Talbank XML files.")
+    parser.add_argument("-s", "--speaker", metavar="SPEAKER",
+                        help="Filter output to utterances by %(metavar)s")
+    parser.add_argument("-l", "--label-speakers", metavar="X", default=1,
+                        type=int, choices=[0, 1],
+                        help=("Set to 0 to remove speaker labels. "
+                              "defaults to %(default)s"))
     parser.add_argument("-m", "--mapping-file", required=False,
-                        default=path.join(here, "mor-to-larc-mapping.csv"))
+                        default=path.join(here, "mor-to-larc-mapping.csv"),
+                        help="""A two-column csv file specifying the mappings
+                                between the MOR and the target tagset. see the
+                                README for more details. defaults to
+                                %(default)s""")
     args = parser.parse_args()
-    main(args.mapping_file, args.filenames)
+    for line in translate_document(args.filenames, args.mapping_file,
+                                   args.speaker, args.label_speakers):
+        print line
